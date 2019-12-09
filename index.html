@@ -123,6 +123,7 @@ var boxSize = 5;
 // Various global THREE.Objects.
 var scene;
 var cube;
+var rectangle;
 var controls;
 var effect;
 var camera;
@@ -156,18 +157,27 @@ function onLoad() {
 
   // Add a repeating grid as a skybox.
   var loader = new THREE.TextureLoader();
-  loader.load('img/box.png', onTextureLoaded);
+  loader.load('img/téléchargement.jpeg', onTextureLoaded);
 
   // Create 3D objects.
-  var geometry = new THREE.BoxGeometry(0.5, 0.5, 0.5);
+  var geometry = new THREE.BoxGeometry(0.2, 0.2, 0.2); // largeur ,hauteur ,longeur
   var material = new THREE.MeshNormalMaterial();
   cube = new THREE.Mesh(geometry, material);
+  var geo = new THREE.BoxGeometry(0.2, 0.2, 0.5)
+  rectangle = new THREE.Mesh(geo, material);
+  var geoCircle = new THREE.CircleGeometry( 0.2, 100 );
+  var mateCircle = new THREE.MeshBasicMaterial( { color: 0xf2f2f2 } );
+  var circle = new THREE.Mesh( geoCircle, mateCircle );
 
   // Position cube mesh to be right in front of you.
-  cube.position.set(0, controls.userHeight, -1);
+  cube.position.set(1, controls.userHeight, -1);
+  rectangle.position.set(-1, controls.userHeight, -1);
+  circle.position.set(0, controls.userHeight, -1);
 
   // Add cube mesh to your three.js scene
   scene.add(cube);
+  scene.add(rectangle);
+  scene.add(circle);
 
   window.addEventListener('resize', onResize, true);
   window.addEventListener('vrdisplaypresentchange', onResize, true);
@@ -222,6 +232,7 @@ function animate(timestamp) {
 
   // Apply rotation to cube mesh
   cube.rotation.y += delta * 0.0006;
+  rectangle.rotation.x += delta * 0.0006;
 
   // Only update controls if we're presenting.
   if (vrButton.isPresenting()) {
@@ -267,7 +278,7 @@ function setStageDimensions(stage) {
   scene.add(skybox);
 
   // Place the cube in the middle of the scene, at user height.
-  cube.position.set(0, controls.userHeight, 0);
+  // cube.position.set(0, controls.userHeight, 0);
 }
 
 window.addEventListener('load', onLoad);
