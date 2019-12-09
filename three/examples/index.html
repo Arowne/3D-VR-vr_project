@@ -75,43 +75,43 @@
 				group = new THREE.Group();
 				scene.add( group );
 
-				var geometries = [
-					new THREE.BoxBufferGeometry( 0.2, 0.2, 0.2 ),
-					new THREE.ConeBufferGeometry( 0.2, 0.2, 64 ),
-					new THREE.CylinderBufferGeometry( 0.2, 0.2, 0.2, 64 ),
-					new THREE.IcosahedronBufferGeometry( 0.2, 3 ),
-					new THREE.TorusBufferGeometry( 0.2, 0.04, 64, 32 )
-				];
+				// var geometries = [
+				// 	new THREE.BoxBufferGeometry( 0.2, 0.2, 0.2 ),
+				// 	new THREE.ConeBufferGeometry( 0.2, 0.2, 64 ),
+				// 	new THREE.CylinderBufferGeometry( 0.2, 0.2, 0.2, 64 ),
+				// 	new THREE.IcosahedronBufferGeometry( 0.2, 3 ),
+				// 	new THREE.TorusBufferGeometry( 0.2, 0.04, 64, 32 )
+				// ];
 
-				for ( var i = 0; i < 50; i ++ ) {
+				// for ( var i = 0; i < 50; i ++ ) {
 
-					var geometry = geometries[ Math.floor( Math.random() * geometries.length ) ];
-					var material = new THREE.MeshStandardMaterial( {
-						color: Math.random() * 0xffffff,
-						roughness: 0.7,
-						metalness: 0.0
-					} );
+				// 	var geometry = geometries[ Math.floor( Math.random() * geometries.length ) ];
+				// 	var material = new THREE.MeshStandardMaterial( {
+				// 		color: Math.random() * 0xffffff,
+				// 		roughness: 0.7,
+				// 		metalness: 0.0
+				// 	} );
 
-					var object = new THREE.Mesh( geometry, material );
+				// 	var object = new THREE.Mesh( geometry, material );
 
-					object.position.x = Math.random() * 4 - 2;
-					object.position.y = Math.random() * 2;
-					object.position.z = Math.random() * 4 - 2;
+				// 	object.position.x = Math.random() * 4 - 2;
+				// 	object.position.y = Math.random() * 2;
+				// 	object.position.z = Math.random() * 4 - 2;
 
-					object.rotation.x = Math.random() * 2 * Math.PI;
-					object.rotation.y = Math.random() * 2 * Math.PI;
-					object.rotation.z = Math.random() * 2 * Math.PI;
+				// 	object.rotation.x = Math.random() * 2 * Math.PI;
+				// 	object.rotation.y = Math.random() * 2 * Math.PI;
+				// 	object.rotation.z = Math.random() * 2 * Math.PI;
 
-					object.scale.setScalar( Math.random() + 0.5 );
+				// 	object.scale.setScalar( Math.random() + 0.5 );
 
-					object.castShadow = true;
-					object.receiveShadow = true;
+				// 	object.castShadow = true;
+				// 	object.receiveShadow = true;
 
-					group.add( object );
+					// group.add( object );
 
-				}
+			// }
 
-				//
+				
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -128,12 +128,14 @@
 
 				controller1 = renderer.vr.getController( 0 );
 				controller1.addEventListener( 'selectstart', onSelectStart );
+				controller1.addEventListener('selectstart', onShoot);
 				controller1.addEventListener( 'selectend', onSelectEnd );
 				scene.add( controller1 );
 
 				controller2 = renderer.vr.getController( 1 );
 				controller2.addEventListener( 'selectstart', onSelectStart );
 				controller2.addEventListener( 'selectend', onSelectEnd );
+				controller2.addEventListener('selectstart', onShoot);
 				scene.add( controller2 );
 
 				//
@@ -204,6 +206,24 @@
 
 				}
 
+
+			}
+
+			function onShoot ( event ) {
+				var controller = event.target;
+				var geometry = new THREE.IcosahedronBufferGeometry( 0.2, 3 );
+				var material = new THREE.MeshStandardMaterial( {
+						color: Math.random() * 0xffffff,
+						roughness: 0.7,
+						metalness: 0.0
+					} );
+
+				var bullet = new THREE.Mesh( geometry, material );
+
+				bullet.position.x = controller.position.x;
+				bullet.position.y = controller.position.y;
+				bullet.position.z = controller.position.z - 2;
+				scene.add(bullet);
 
 			}
 
