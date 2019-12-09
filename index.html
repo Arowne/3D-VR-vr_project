@@ -196,14 +196,10 @@ function onLoad() {
 }
 
 function onTextureLoaded(texture) {
-  texture.wrapS = THREE.RepeatWrapping;
-  texture.wrapT = THREE.RepeatWrapping;
-  texture.repeat.set(boxSize, boxSize);
 
-  var geometry = new THREE.BoxGeometry(boxSize, boxSize, boxSize);
+  var geometry = new THREE.BoxGeometry( boxSize, boxSize, boxSize );
   var material = new THREE.MeshBasicMaterial({
     map: texture,
-    color: 0x01BE00,
     side: THREE.BackSide
   });
 
