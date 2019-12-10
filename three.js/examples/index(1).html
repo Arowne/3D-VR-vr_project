@@ -168,12 +168,14 @@
 
 				var controller = event.target;
 
-				var intersections = getIntersections( controller );
+				var geometry = geometries[ Math.floor( Math.random() * geometries.length ) ];
+					var material = new THREE.MeshStandardMaterial( {
+						color: Math.random() * 0xffffff,
+						roughness: 0.7,
+						metalness: 0.0
+					} );
 
-				if ( intersections.length > 0 ) {
-
-					var intersection = intersections[ 0 ];
-
+				var object = new THREE.Mesh( geometry, material );
 					tempMatrix.getInverse( controller.matrixWorld );
 
 					var object = intersection.object;
@@ -183,8 +185,6 @@
 					controller.add( object );
 
 					controller.userData.selected = object;
-
-				}
 
 			}
 
