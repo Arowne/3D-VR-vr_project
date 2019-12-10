@@ -15,9 +15,6 @@
 
 	<div id="info">
 		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> vr - ball shooter
-		<div class="debug">
-
-		</div>
 	</div>
 
 	<script src="js/vr/HelioWebXRPolyfill.js"></script>
@@ -39,10 +36,10 @@
 		function init() {
 			scene = new THREE.Scene();
 			scene.background = new THREE.Color(0x505050);
-			camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 10);
+			camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 100);
 			camera.position.set(0, 1.6, 3);
 			room = new THREE.LineSegments(
-				new BoxLineGeometry(6, 6, 6, 100, 100, 100),
+				new BoxLineGeometry(50, 50, 50, 100, 100, 100),
 				new THREE.LineBasicMaterial({ color: 0x808080 })
 			);
 			room.geometry.translate(0, 3, 0);
@@ -61,7 +58,6 @@
 			circle.position.y = 0.5 * 4;
 			circle.position.z = -2;
 			scene.add(circle);
-			circle.add(camera);
 
 			// Create ball
 			var geometry = new THREE.IcosahedronBufferGeometry(radius, 2);
@@ -94,7 +90,6 @@
 			controller1 = renderer.vr.getController(0);
 			controller1.addEventListener('selectstart', onSelectStart);
 			controller1.addEventListener('selectend', onSelectEnd);
-			circle.add(controller1,);
 
 			controller2 = renderer.vr.getController(1);
 			controller2.addEventListener('selectstart', onSelectStart);
@@ -123,10 +118,10 @@
 			renderer.setSize(window.innerWidth, window.innerHeight);
 		}
 
-		function handleController(controller, circle) {
+		function handleController(controller) {
 			if (controller.userData.isSelecting) {
 				var object = room.children[0];
-				object.position.copy(circle.position);
+				object.position.copy(controller.position);
 				object.position.y += 1
 				object.userData.velocity.x = (0.5 - 0.5) * 3;
 				object.userData.velocity.y = (0.5 - 0.5) * 3;
@@ -139,7 +134,7 @@
 			renderer.setAnimationLoop(render);
 		}
 		function render() {
-			handleController(controller1, circle);
+			handleController(controller1);
 			handleController(controller2);
 			//
 			var delta = clock.getDelta() * 5; // slow down simulation
@@ -149,7 +144,6 @@
 			object.position.y += object.userData.velocity.y * delta;
 			object.position.z += object.userData.velocity.z * delta;
 
-			circle.rotation.y += 0.01;
 			// Wall collision
 			if (object.position.x < - range || object.position.x > range) {
 				object.position.x = THREE.Math.clamp(object.position.x, - range, range);
