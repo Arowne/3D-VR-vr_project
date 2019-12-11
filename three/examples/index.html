@@ -1267,7 +1267,7 @@ loadTexture: function ( url, mapping, onLoad, onProgress, onError ) {
 			camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 100);
 			camera.position.set(0, 1.6, 3);
 			room = new THREE.LineSegments(
-				new BoxLineGeometry(50, 50, 50, 100, 100, 100),
+				new BoxLineGeometry(100, 100, 100, 100, 100, 100),
 				new THREE.LineBasicMaterial({ color: 0x808080 })
 			);
 			room.geometry.translate(0, 3, 0);
@@ -1279,17 +1279,23 @@ loadTexture: function ( url, mapping, onLoad, onProgress, onError ) {
 			scene.add(light);
 
 			// Create target
-			var geometry = new THREE.CircleGeometry(0.5, 32);
-			var material = new THREE.MeshBasicMaterial({ color: 0xffff00 });
+
+			var geometry = new THREE.CircleGeometry(0.3, 32);
+			
+			for (var i  = 0; i < 20; i++){
+			var material = new THREE.MeshBasicMaterial({ color: Math.random() * 0xffffff });
+			
 			circle = new THREE.Mesh(geometry, material);
-			circle.position.x = 0.5 * 4 - 2;
-			circle.position.y = 0.5 * 4;
-			circle.position.z = -2;
-			// scene.add(circle);
+			circle.position.x = Math.random() * 6 - 2;
+			circle.position.y = Math.random() * 6;
+			circle.position.z = Math.random() * 6 - 2;
+			scene.add(circle);
+			}
 
 			// Create ball
 			var geometry = new THREE.IcosahedronBufferGeometry(radius, 2);
 			var object = new THREE.Mesh(geometry, new THREE.MeshLambertMaterial({ color: 0xffffff }));
+			
 			object.position.x = 0.5 * 4 - 2;
 			object.position.y = 0.5 * 4;
 			object.position.z = 0.5 * 4 - 2;
@@ -1304,9 +1310,19 @@ loadTexture: function ( url, mapping, onLoad, onProgress, onError ) {
 			// mtlLoader.setTexturePath('/assets/obj_and_mtl/');
 			// mtlLoader.setPath('/assets/moon-floor/');
 			mtlLoader.load('./asset/bank.mtl', function (materials) {
-
-				materials.preload();
-				var textureLoader = new THREE.TextureLoader();
+				// var textureLoader = new THREE.TextureLoader();
+				// textureLoader.load(
+				// 	'./asset/m1.jpg',
+				// 	'./asset/m2.jpg',
+				// 	'./asset/m3.jpg',
+				// 	'./asset/m4.jpg',
+				// 	'./asset/m5.jpg',
+				// 	'./asset/m6.jpg',
+				// materials = new THREE.MeshBasicMaterial( {
+				// 	map: texture
+		 		// }),
+				// )
+				materials.preload()
 			})
 			// instantiate a loader
 			var loader = new OBJLoader();
@@ -1314,14 +1330,15 @@ loadTexture: function ( url, mapping, onLoad, onProgress, onError ) {
 			// load a resource
 			loader.load(
 				// resource URL
+				// './asset/Miami 2525/Miami 2525.obj',
 				'./asset/bank.obj',
 				// called when resource is loaded
 				function (object) {
 
-					object.position.z = circle.position.z - 1 ;
-					object.position.x = circle.position.x - 1 ;
-					object.position.y = circle.position.y - 1 ;
-					object.scale.set(0.2, 0.2, 0.2);
+					// object.position.z = circle.position.z - 1 ;
+					// object.position.x = circle.position.x - 1 ;
+					// object.position.y = circle.position.y - 1 ;
+					object.scale.set(0.05, 0.05, 0.05);
 					scene.add(object);
 
 				},
