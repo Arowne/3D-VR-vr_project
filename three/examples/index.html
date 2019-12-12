@@ -2486,6 +2486,8 @@
 		var normal = new THREE.Vector3();
 		var relativeVelocity = new THREE.Vector3();
 		var clock = new THREE.Clock();
+		var move  = true;
+
 
 		init();
 		animate();
@@ -2497,7 +2499,10 @@
 			camera.position.set(0, 0.3, 3);
 			room = new THREE.LineSegments(
 				new BoxLineGeometry(100, 100, 100, 100, 100, 100),
-				new THREE.LineBasicMaterial({ color: 0x808080, opacity: 0, transparent: true })
+				new THREE.LineBasicMaterial({ 
+					color: 0x808080,
+					transparent: true,
+					opacity: 0})
 			);
 			room.geometry.translate(0, 3, 0);
 			scene.add(room);
@@ -2602,8 +2607,9 @@
 			function loadModel() {
 				ufo.traverse(function (child) {
 					if (child.isMesh) child.material.map = texture;
-				});
-				ufo.position.y = 30;
+				});			
+				ufo.rotation.y = Math.PI;
+				ufo.position.y = 5;
 				ufo.position.z = -10;
 				ufo.scale.set(0.013, 0.013, 0.013);
 				scene.add(ufo);
@@ -2709,7 +2715,7 @@
 		function animate() {
 			renderer.setAnimationLoop(render);
 			requestAnimationFrame(animate);
-			moveObject(ufo);
+			// moveObject(ufo);
 
 			// required if controls.enableDamping or controls.autoRotate are set to true
 
@@ -2717,7 +2723,24 @@
 		}
 		function moveObject(ufo) {
 			try {
-				ufo.position.x += 0.1				
+				var increment = 0.1;
+				if (ufo.position.x < 50 && ufo.position.x > -50)
+				{
+					if (move == true) {
+						ufo.position.x += increment
+					} else {
+						ufo.position.x -= increment
+					}
+				} else if (ufo.position.x == 50) {
+					move = false;	
+					ufo.position.x = 48;
+					ufo.rotation.y += Math.PI;
+				} else if (ufo.position.x == -50) {
+					move = true;
+					ufo.position.x = -48;
+					ufo.rotation.y += Math.PI;
+
+				}	
 			} catch (error) {
 				
 			}
