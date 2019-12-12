@@ -2515,7 +2515,7 @@
 				// called when resource is loaded
 				function (object) {
 					object.position.x = 20;
-					object.position.y = 20;
+					object.position.y = 50;
 					object.position.z = 0;
 					object.scale.set(0.04, 0.04, 0.04);
 					scene.add(object);
@@ -2534,7 +2534,7 @@
 				// called when resource is loaded
 				function (object) {
 					object.position.x = -20;
-					object.position.y = 20;
+					object.position.y = 50;
 					object.position.z = 10;
 					object.scale.set(0.04, 0.04, 0.04);
 					scene.add(object);
@@ -2553,37 +2553,9 @@
 				// called when resource is loaded
 				function (object) {
 					object.position.x = 0;
-					object.position.y = 20;
+					object.position.y = 50;
 					object.position.z = -10;
 					object.scale.set(0.04, 0.04, 0.04);
-					scene.add(object);
-				},
-				// called when loading is in progresses
-				function (xhr) {
-					console.log('cloud ' + (xhr.loaded / xhr.total * 100) + '% loaded');
-				},
-				// called when loading has errors
-				function (error) {
-					console.error(error);
-				}
-			);
-
-			loader.load(
-				'./assets/UFO/ufo.obj',
-				// called when resource is loaded
-				function (object) {
-					object.position.x = 0;
-					object.position.y = 20;
-					object.position.z = -10;
-					object.scale.set(0.04, 0.04, 0.04);
-
-					object.traverse(function (child) {
-						if (child instanceof THREE.Mesh) {
-							child.material.ambient.setHex(0xFF0000);
-							child.material.color.setHex(0x00FF00);
-						}
-					});
-
 					scene.add(object);
 				},
 				// called when loading is in progresses
@@ -2611,6 +2583,7 @@
 
 			object.scale.set(0.07, 0.07, 0.07);
 
+			// floor with grass pic
 			var loader = new THREE.TextureLoader();
 			loader.load('assets/photo-1567459169668-95d355371bda.jpeg', onTextureLoaded);
 
@@ -2623,30 +2596,35 @@
 				scene.add(plane);
 			}
 
-			var onProgress = function (xhr) {
+
+			function loadModel() {
+				object.traverse(function (child) {
+					if (child.isMesh) child.material.map = texture;
+				});
+				object.position.y = 30;
+				object.position.z = -10;
+				object.scale.set(0.013, 0.013, 0.013);
+				scene.add(object);
+			}
+			var manager = new THREE.LoadingManager(loadModel);
+			manager.onProgress = function (item, loaded, total) {
+				console.log(item, loaded, total);
+			};
+			// // texture
+			var textureLoader = new THREE.TextureLoader(manager);
+			var texture = textureLoader.load('assets/UFO/ufo_diffuse.png');
+			// model
+			function onProgress(xhr) {
 				if (xhr.lengthComputable) {
 					var percentComplete = xhr.loaded / xhr.total * 100;
-					console.log(Math.round(percentComplete, 2) + '% downloaded');
+					console.log('model ' + Math.round(percentComplete, 2) + '% downloaded');
 				}
-			};
-
-			var onError = function () { };
-			var manager = new THREE.LoadingManager();
-			manager.addHandler(/\.dds$/i, new DDSLoader());
-			// comment in the following line and import TGALoader if your asset uses TGA textures
-			// manager.addHandler( /\.tga$/i, new TGALoader() );
-			new MTLLoader(manager)
-				.setPath('models/obj/male02/')
-				.load('male02_dds.mtl', function (materials) {
-					materials.preload();
-					new OBJLoader(manager)
-						.setMaterials(materials)
-						.setPath('models/obj/male02/')
-						.load('male02.obj', function (object) {
-							object.position.y = - 95;
-							scene.add(object);
-						}, onProgress, onError);
-				});
+			}
+			function onError() { }
+			var loader = new OBJLoader(manager);
+			loader.load('assets/Space_transporter_smooth.obj', function (obj) {
+				object = obj;
+			}, onProgress, onError);
 
 			//
 			renderer = new THREE.WebGLRenderer({ antialias: true });
