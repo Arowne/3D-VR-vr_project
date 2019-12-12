@@ -2472,6 +2472,9 @@
 		import * as THREE from '../build/three.module.js';
 		import { OrbitControls } from './jsm/controls/OrbitControls.js';
 		import { BoxLineGeometry } from './jsm/geometries/BoxLineGeometry.js';
+		import { DDSLoader } from './jsm/loaders/DDSLoader.js';
+		import { MTLLoader } from './jsm/loaders/MTLLoader.js';
+		import { OBJLoader } from './jsm/loaders/OBJLoader.js';
 		import { VRButton } from './jsm/webxr/VRButton.js';
 
 		var camera, scene, renderer;
@@ -2486,7 +2489,7 @@
 		animate();
 		function init() {
 			scene = new THREE.Scene();
-			scene.background = new THREE.TextureLoader().load('assets/sky.jpeg');;
+			scene.background = new THREE.TextureLoader().load('assets/sky.jpeg');
 
 			camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 10000);
 			camera.position.set(0, 0.3, 3);
@@ -2564,29 +2567,34 @@
 					console.error(error);
 				}
 			);
-			
-			const TextureLoader = new MTLLoader();
 
-			// Load 3d gun object
-			TextureLoader.setTexturePath('./assets/UFO/');
-			TextureLoader.setPath('./assets/UFO/');
-			TextureLoader.load('ufo.mtl', function (materials) {
-				const objLoader = new OBJLoader();
-				objLoader.setPath('./assets/UFO/');
-				objLoader.load('ufo.obj', function (object) {
-					const textureLoader = new THREE.TextureLoader();
-					const map = textureLoader.load('./assets/UFO/ufo_diffuse.png');
-					const material = new THREE.MeshPhongMaterial({ map: map });
+			loader.load(
+				'./assets/UFO/ufo.obj',
+				// called when resource is loaded
+				function (object) {
+					object.position.x = 0;
+					object.position.y = 20;
+					object.position.z = -10;
+					object.scale.set(0.04, 0.04, 0.04);
+
 					object.traverse(function (child) {
 						if (child instanceof THREE.Mesh) {
-							child.material = materials
+							child.material.ambient.setHex(0xFF0000);
+							child.material.color.setHex(0x00FF00);
 						}
 					});
 
-					object.scale.set(0.5, 0.5, 0.5);
 					scene.add(object);
-				});
-			})
+				},
+				// called when loading is in progresses
+				function (xhr) {
+					console.log('cloud ' + (xhr.loaded / xhr.total * 100) + '% loaded');
+				},
+				// called when loading has errors
+				function (error) {
+					console.error(error);
+				}
+			);
 
 			// Create ball
 			var geometry = new THREE.IcosahedronBufferGeometry(radius * 10, 2);
@@ -2615,6 +2623,31 @@
 				scene.add(plane);
 			}
 
+			var onProgress = function (xhr) {
+				if (xhr.lengthComputable) {
+					var percentComplete = xhr.loaded / xhr.total * 100;
+					console.log(Math.round(percentComplete, 2) + '% downloaded');
+				}
+			};
+
+			var onError = function () { };
+			var manager = new THREE.LoadingManager();
+			manager.addHandler(/\.dds$/i, new DDSLoader());
+			// comment in the following line and import TGALoader if your asset uses TGA textures
+			// manager.addHandler( /\.tga$/i, new TGALoader() );
+			new MTLLoader(manager)
+				.setPath('models/obj/male02/')
+				.load('male02_dds.mtl', function (materials) {
+					materials.preload();
+					new OBJLoader(manager)
+						.setMaterials(materials)
+						.setPath('models/obj/male02/')
+						.load('male02.obj', function (object) {
+							object.position.y = - 95;
+							scene.add(object);
+						}, onProgress, onError);
+				});
+
 			//
 			renderer = new THREE.WebGLRenderer({ antialias: true });
 			renderer.setPixelRatio(window.devicePixelRatio);
@@ -2640,7 +2673,7 @@
 			controller2.addEventListener('selectstart', onSelectStart);
 			controller2.addEventListener('selectend', onSelectEnd);
 			scene.add(controller2);
-			
+
 			// Add line guide
 			var geometry = new THREE.BufferGeometry();
 			geometry.setAttribute('position', new THREE.Float32BufferAttribute([0, 0, 0, 0, 0, - 1], 3));
