@@ -2479,12 +2479,14 @@
 
 		var camera, scene, renderer;
 		var controller1, controller2;
+		var ufo = "foo";
 		var room;
 		var count = 0;
 		var radius = 0.005;
 		var normal = new THREE.Vector3();
 		var relativeVelocity = new THREE.Vector3();
 		var clock = new THREE.Clock();
+
 		init();
 		animate();
 		function init() {
@@ -2598,13 +2600,13 @@
 
 
 			function loadModel() {
-				object.traverse(function (child) {
+				ufo.traverse(function (child) {
 					if (child.isMesh) child.material.map = texture;
 				});
-				object.position.y = 30;
-				object.position.z = -10;
-				object.scale.set(0.013, 0.013, 0.013);
-				scene.add(object);
+				ufo.position.y = 30;
+				ufo.position.z = -10;
+				ufo.scale.set(0.013, 0.013, 0.013);
+				scene.add(ufo);
 			}
 			var manager = new THREE.LoadingManager(loadModel);
 			manager.onProgress = function (item, loaded, total) {
@@ -2623,7 +2625,7 @@
 			function onError() { }
 			var loader = new OBJLoader(manager);
 			loader.load('assets/Space_transporter_smooth.obj', function (obj) {
-				object = obj;
+				ufo = obj;
 			}, onProgress, onError);
 
 			//
@@ -2707,10 +2709,18 @@
 		function animate() {
 			renderer.setAnimationLoop(render);
 			requestAnimationFrame(animate);
+			moveObject(ufo);
 
 			// required if controls.enableDamping or controls.autoRotate are set to true
 
 			renderer.render(scene, camera);
+		}
+		function moveObject(ufo) {
+			try {
+				ufo.position.x += 0.1				
+			} catch (error) {
+				
+			}
 		}
 		function render() {
 			handleController(controller1);
@@ -2723,7 +2733,7 @@
 			object.position.x += object.userData.velocity.x * delta;
 			object.position.y += object.userData.velocity.y * delta;
 			object.position.z += object.userData.velocity.z * delta;
-
+			
 			// Wall collision
 			if (object.position.x < - range || object.position.x > range) {
 				object.position.x = THREE.Math.clamp(object.position.x, - range, range);
